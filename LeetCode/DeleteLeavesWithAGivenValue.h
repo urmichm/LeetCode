@@ -18,53 +18,70 @@
       TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
       TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
   };
-  
-class Solution {
-public:
-	bool isLeaf(TreeNode* node)
-	{
-		return (node->left == nullptr) && (node->right == nullptr);
-	}
 
-	TreeNode* removeLeafNodes(TreeNode* node, int target)
-	{
-		if (node == nullptr) return nullptr;
+  static TreeNode* removeLeafNodes(TreeNode* node, int target);
+  static void removeLeafNodes(void);
 
-		if (node->left) {
-			if (isLeaf(node->left) && node->left->val == target) {
+
+static bool isLeaf(TreeNode* node)
+{
+	return (node->left == nullptr) && (node->right == nullptr);
+}
+
+static void removeLeafNodes(void)
+{	
+	const int TARGET = 2;
+	TreeNode* root;
+	TreeNode* leaf = new TreeNode(TARGET, nullptr, nullptr);
+	TreeNode* subleaf = new TreeNode(TARGET, leaf, nullptr);
+
+	//root = new TreeNode(TARGET, nullptr, nullptr);
+	root = new TreeNode(TARGET, nullptr, subleaf);
+
+	root = removeLeafNodes(root, TARGET);
+
+}
+
+
+
+static TreeNode* removeLeafNodes(TreeNode* node, int target)
+{
+	if (node == nullptr) return nullptr;
+
+	if (node->left) {
+		if (isLeaf(node->left) && node->left->val == target) {
+			delete (node->left);
+			node->left = nullptr;
+		}
+		else {
+			node->left = removeLeafNodes(node->left, target);
+			if (node->left != nullptr &&
+				isLeaf(node->left) && node->left->val == target) {
 				delete (node->left);
 				node->left = nullptr;
 			}
-			else {
-				node->left = removeLeafNodes(node->left, target);
-				if (node->left != nullptr &&
-					isLeaf(node->left) && node->left->val == target) {
-					delete (node->left);
-					node->left = nullptr;
-				}
-			}
 		}
-		if (node->right) {
-			if (isLeaf(node->right) && node->right->val == target) {
+	}
+	if (node->right) {
+		if (isLeaf(node->right) && node->right->val == target) {
+			delete (node->right);
+			node->right = nullptr;
+		}
+		else {
+			node->right = removeLeafNodes(node->right, target);
+			if (node->right &&
+				isLeaf(node->right) && node->right->val == target) {
 				delete (node->right);
 				node->right = nullptr;
 			}
-			else {
-				node->right = removeLeafNodes(node->right, target);
-				if (node->right &&
-					isLeaf(node->right) && node->right->val == target) {
-					delete (node->right);
-					node->right = nullptr;
-				}
-			}
 		}
-
-		if (isLeaf(node) && node->val == target) {
-			// delete (node); 
-			node = nullptr;
-		}
-
-		return node;
 	}
 
-};
+	if (isLeaf(node) && node->val == target) {
+		delete (node); 
+		node = nullptr;
+	}
+
+	return node;
+}
+
